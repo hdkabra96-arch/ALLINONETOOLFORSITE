@@ -30,6 +30,8 @@ import {
   Compass,
   Book,
   Briefcase,
+  Maximize,
+  FileDown,
   type LucideIcon
 } from 'lucide-react';
 
@@ -55,6 +57,11 @@ export const TOOLS: Tool[] = [
   { id: 'merge', name: 'Merge PDF', icon: Layers, category: 'Organize', description: 'Combine multiple PDFs into one unified document.', implemented: true },
   { id: 'split', name: 'Split PDF', icon: SplitSquareHorizontal, category: 'Organize', description: 'Separate one page or a whole set for easy conversion into independent PDF files.', implemented: true },
   { id: 'compress', name: 'Compress PDF', icon: Minimize, category: 'Optimize', description: 'Reduce file size while optimizing for maximal PDF quality.' },
+  { id: 'increase-pdf-size', name: 'Increase PDF Size', icon: Maximize, category: 'Optimize', description: 'Increase the file size of your PDF document.', implemented: true },
+  { id: 'compress-pdf-50kb', name: 'Compress PDF to 50KB', icon: FileDown, category: 'Optimize', description: 'Compress your PDF document to 50KB.', implemented: true },
+  { id: 'compress-pdf-100kb', name: 'Compress PDF to 100KB', icon: FileDown, category: 'Optimize', description: 'Compress your PDF document to 100KB.', implemented: true },
+  { id: 'compress-pdf-200kb', name: 'Compress PDF to 200KB', icon: FileDown, category: 'Optimize', description: 'Compress your PDF document to 200KB.', implemented: true },
+  { id: 'compress-pdf-500kb', name: 'Compress PDF to 500KB', icon: FileDown, category: 'Optimize', description: 'Compress your PDF document to 500KB.', implemented: true },
   { id: 'pdf-to-word', name: 'PDF to Word', icon: FileText, category: 'Convert from PDF', description: 'Easily convert your PDF files into easy to edit DOC and DOCX documents.' },
   { id: 'pdf-to-powerpoint', name: 'PDF to PowerPoint', icon: Presentation, category: 'Convert from PDF', description: 'Turn your PDF files into easy to edit PPT and PPTX slideshows.' },
   { id: 'pdf-to-excel', name: 'PDF to Excel', icon: Table, category: 'Convert from PDF', description: 'Pull data straight from PDFs into Excel spreadsheets in a few short seconds.' },

@@ -1,12 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { TOOLS, type ToolCategory } from '../lib/tools';
 import { cn } from '../lib/utils';
+import { Search } from 'lucide-react';
 
 export function Home({ onSelectTool }: { onSelectTool: (id: string) => void }) {
+  const [searchQuery, setSearchQuery] = useState('');
+
   const categories: ToolCategory[] = [
     'Organize', 'Optimize', 'Convert to PDF', 'Convert from PDF', 'Edit', 'Security', 'AI Tools'
   ];
+
+  const filteredTools = TOOLS.filter(tool => 
+    tool.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    tool.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="pb-24">
@@ -33,23 +41,47 @@ export function Home({ onSelectTool }: { onSelectTool: (id: string) => void }) {
           >
             All are 100% FREE and easy to use! Merge, split, compress, convert, edit, and power up your PDFs with AI.
           </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="relative max-w-2xl mx-auto"
+          >
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Search className="h-6 w-6 text-slate-400" />
+            </div>
+            <input
+              type="text"
+              className="block w-full pl-12 pr-4 py-4 rounded-2xl border-0 ring-1 ring-inset ring-slate-700 bg-slate-800/50 text-white placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-red-500 sm:text-lg sm:leading-6 backdrop-blur-md transition-all"
+              placeholder="Search for tools (e.g., 'merge', 'word to pdf')..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </motion.div>
         </div>
       </section>
 
       {/* Tools Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20">
-        {categories.map((category, idx) => {
-          const categoryTools = TOOLS.filter(t => t.category === category);
-          if (categoryTools.length === 0) return null;
-          
-          return (
-            <div key={category} className="mb-16">
-              <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center">
-                {category}
-                <div className="ml-4 h-px bg-slate-200 flex-1"></div>
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {categoryTools.map((tool, toolIdx) => (
+        {filteredTools.length === 0 ? (
+          <div className="text-center py-20 bg-white rounded-3xl shadow-sm border border-slate-100">
+            <h3 className="text-2xl font-bold text-slate-900 mb-2">No tools found</h3>
+            <p className="text-slate-500">Try adjusting your search query to find what you're looking for.</p>
+          </div>
+        ) : (
+          categories.map((category, idx) => {
+            const categoryTools = filteredTools.filter(t => t.category === category);
+            if (categoryTools.length === 0) return null;
+            
+            return (
+              <div key={category} className="mb-16">
+                <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center">
+                  {category}
+                  <div className="ml-4 h-px bg-slate-200 flex-1"></div>
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {categoryTools.map((tool, toolIdx) => (
                   <motion.div
                     key={tool.id}
                     initial={{ opacity: 0, y: 20 }}
@@ -81,7 +113,8 @@ export function Home({ onSelectTool }: { onSelectTool: (id: string) => void }) {
               </div>
             </div>
           );
-        })}
+        })
+        )}
       </section>
     </div>
   );

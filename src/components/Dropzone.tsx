@@ -1,11 +1,11 @@
 import React, { useCallback } from 'react';
-import { useDropzone } from 'react-dropzone';
+import { useDropzone, type Accept } from 'react-dropzone';
 import { UploadCloud, File as FileIcon } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 interface DropzoneProps {
   onFilesAccepted: (files: File[]) => void;
-  accept?: Record<string, string[]>;
+  accept?: Accept;
   maxFiles?: number;
   title?: string;
   subtitle?: string;
@@ -28,7 +28,7 @@ export function Dropzone({
     onDrop, 
     accept,
     maxFiles: maxFiles > 0 ? maxFiles : undefined
-  });
+  } as any);
 
   return (
     <div 
