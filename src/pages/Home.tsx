@@ -3,17 +3,35 @@ import { motion } from 'motion/react';
 import { TOOLS, type ToolCategory } from '../lib/tools';
 import { cn } from '../lib/utils';
 import { Search } from 'lucide-react';
+import type { ToolFilter } from '../App';
 
-export function Home({ onSelectTool }: { onSelectTool: (id: string) => void }) {
+export function Home({ onSelectTool, currentFilter }: { onSelectTool: (id: string) => void, currentFilter: ToolFilter }) {
   const [searchQuery, setSearchQuery] = useState('');
 
-  const categories: ToolCategory[] = [
+  const pdfCategories: ToolCategory[] = [
     'Organize', 'Optimize', 'Convert to PDF', 'Convert from PDF', 'Edit', 'Security', 'AI Tools'
   ];
 
+  const imageCategories: ToolCategory[] = [
+    'Most Used Tools', 'Basic Editing', 'Blur, Pixlate and Special Effects', 'DPI & Quality',
+    'General Resizing', 'Resize Other Official Sizes', 'Passport & ID Photo Sizes',
+    'Resize For Social Media', 'Format Conversions', 'Image to PDF', 'General Compression',
+    'Exact Target Sizes', 'GIF Tools', 'Pi7 Tools', 'Other Tools', 'Convert Images'
+  ];
+
+  let categoriesToDisplay: ToolCategory[] = [];
+  if (currentFilter === 'ALL') {
+    categoriesToDisplay = [...pdfCategories, ...imageCategories];
+  } else if (currentFilter === 'PDF') {
+    categoriesToDisplay = pdfCategories;
+  } else if (currentFilter === 'IMAGE') {
+    categoriesToDisplay = imageCategories;
+  }
+
   const filteredTools = TOOLS.filter(tool => 
-    tool.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    tool.description.toLowerCase().includes(searchQuery.toLowerCase())
+    categoriesToDisplay.includes(tool.category) &&
+    (tool.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    tool.description.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   return (
@@ -70,7 +88,7 @@ export function Home({ onSelectTool }: { onSelectTool: (id: string) => void }) {
             <p className="text-slate-500">Try adjusting your search query to find what you're looking for.</p>
           </div>
         ) : (
-          categories.map((category, idx) => {
+          categoriesToDisplay.map((category, idx) => {
             const categoryTools = filteredTools.filter(t => t.category === category);
             if (categoryTools.length === 0) return null;
             

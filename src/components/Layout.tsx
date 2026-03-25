@@ -1,7 +1,16 @@
 import React from 'react';
 import { FileText, Github, Menu } from 'lucide-react';
+import type { ToolFilter } from '../App';
+import { cn } from '../lib/utils';
 
-export function Layout({ children, onNavigateHome }: { children: React.ReactNode, onNavigateHome: () => void }) {
+interface LayoutProps {
+  children: React.ReactNode;
+  onNavigateHome: () => void;
+  currentFilter: ToolFilter;
+  onFilterChange: (filter: ToolFilter) => void;
+}
+
+export function Layout({ children, onNavigateHome, currentFilter, onFilterChange }: LayoutProps) {
   return (
     <div className="min-h-screen bg-[#f5f5f5] text-slate-900 font-sans flex flex-col">
       <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
@@ -13,8 +22,25 @@ export function Layout({ children, onNavigateHome }: { children: React.ReactNode
               </div>
               <span className="font-bold text-xl tracking-tight">PDF Master Pro</span>
             </div>
-            <div className="flex space-x-8">
-              <button onClick={onNavigateHome} className="text-sm font-medium text-slate-600 hover:text-slate-900">All Tools</button>
+            <div className="flex space-x-8 items-center">
+              <button 
+                onClick={() => onFilterChange('IMAGE')} 
+                className={cn("text-sm font-bold transition-colors", currentFilter === 'IMAGE' ? "text-red-600" : "text-slate-600 hover:text-slate-900")}
+              >
+                IMAGE
+              </button>
+              <button 
+                onClick={() => onFilterChange('PDF')} 
+                className={cn("text-sm font-bold transition-colors", currentFilter === 'PDF' ? "text-red-600" : "text-slate-600 hover:text-slate-900")}
+              >
+                PDF
+              </button>
+              <button 
+                onClick={() => onFilterChange('ALL')} 
+                className={cn("text-sm font-bold transition-colors", currentFilter === 'ALL' ? "text-red-600" : "text-slate-600 hover:text-slate-900")}
+              >
+                ALL TOOLS
+              </button>
             </div>
           </div>
         </div>
