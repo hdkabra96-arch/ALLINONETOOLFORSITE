@@ -89,6 +89,17 @@ export type ToolCategory =
   | 'Other Tools'
   | 'Convert Images';
 
+export const PDF_CATEGORIES: ToolCategory[] = [
+  'Organize', 'Optimize', 'Convert to PDF', 'Convert from PDF', 'Edit', 'Security', 'AI Tools'
+];
+
+export const IMAGE_CATEGORIES: ToolCategory[] = [
+  'Most Used Tools', 'Basic Editing', 'Blur, Pixlate and Special Effects', 'DPI & Quality',
+  'General Resizing', 'Resize Other Official Sizes', 'Passport & ID Photo Sizes',
+  'Resize For Social Media', 'Format Conversions', 'Image to PDF', 'General Compression',
+  'Exact Target Sizes', 'GIF Tools', 'Pi7 Tools', 'Other Tools', 'Convert Images'
+];
+
 export interface Tool {
   id: string;
   name: string;

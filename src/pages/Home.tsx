@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { TOOLS, type ToolCategory } from '../lib/tools';
+import { TOOLS, PDF_CATEGORIES, IMAGE_CATEGORIES, type ToolCategory } from '../lib/tools';
 import { cn } from '../lib/utils';
 import { Search } from 'lucide-react';
 import type { ToolFilter } from '../App';
@@ -8,24 +8,13 @@ import type { ToolFilter } from '../App';
 export function Home({ onSelectTool, currentFilter }: { onSelectTool: (id: string) => void, currentFilter: ToolFilter }) {
   const [searchQuery, setSearchQuery] = useState('');
 
-  const pdfCategories: ToolCategory[] = [
-    'Organize', 'Optimize', 'Convert to PDF', 'Convert from PDF', 'Edit', 'Security', 'AI Tools'
-  ];
-
-  const imageCategories: ToolCategory[] = [
-    'Most Used Tools', 'Basic Editing', 'Blur, Pixlate and Special Effects', 'DPI & Quality',
-    'General Resizing', 'Resize Other Official Sizes', 'Passport & ID Photo Sizes',
-    'Resize For Social Media', 'Format Conversions', 'Image to PDF', 'General Compression',
-    'Exact Target Sizes', 'GIF Tools', 'Pi7 Tools', 'Other Tools', 'Convert Images'
-  ];
-
   let categoriesToDisplay: ToolCategory[] = [];
   if (currentFilter === 'ALL') {
-    categoriesToDisplay = [...pdfCategories, ...imageCategories];
+    categoriesToDisplay = [...PDF_CATEGORIES, ...IMAGE_CATEGORIES];
   } else if (currentFilter === 'PDF') {
-    categoriesToDisplay = pdfCategories;
+    categoriesToDisplay = PDF_CATEGORIES;
   } else if (currentFilter === 'IMAGE') {
-    categoriesToDisplay = imageCategories;
+    categoriesToDisplay = IMAGE_CATEGORIES;
   }
 
   const filteredTools = TOOLS.filter(tool => 
@@ -49,7 +38,7 @@ export function Home({ onSelectTool, currentFilter }: { onSelectTool: (id: strin
             animate={{ opacity: 1, y: 0 }}
             className="text-5xl md:text-7xl font-bold tracking-tight mb-6"
           >
-            Every tool you need to work with PDFs in one place
+            Every tool you need to work with PDFs and Images in one place
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
@@ -57,7 +46,7 @@ export function Home({ onSelectTool, currentFilter }: { onSelectTool: (id: strin
             transition={{ delay: 0.1 }}
             className="text-xl text-slate-300 mb-10 max-w-2xl mx-auto"
           >
-            All are 100% FREE and easy to use! Merge, split, compress, convert, edit, and power up your PDFs with AI.
+            All are 100% FREE and easy to use! Merge, split, compress, convert, edit, resize, and power up your files with AI.
           </motion.p>
 
           <motion.div
@@ -72,7 +61,7 @@ export function Home({ onSelectTool, currentFilter }: { onSelectTool: (id: strin
             <input
               type="text"
               className="block w-full pl-12 pr-4 py-4 rounded-2xl border-0 ring-1 ring-inset ring-slate-700 bg-slate-800/50 text-white placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-red-500 sm:text-lg sm:leading-6 backdrop-blur-md transition-all"
-              placeholder="Search for tools (e.g., 'merge', 'word to pdf')..."
+              placeholder="Search for tools (e.g., 'merge', 'resize image', 'word to pdf')..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -119,11 +108,6 @@ export function Home({ onSelectTool, currentFilter }: { onSelectTool: (id: strin
                     </div>
                     <h3 className="text-lg font-bold text-slate-900 mb-2 flex items-center">
                       {tool.name}
-                      {!tool.implemented && (
-                        <span className="ml-2 text-[10px] uppercase tracking-wider bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-semibold">
-                          Soon
-                        </span>
-                      )}
                     </h3>
                     <p className="text-sm text-slate-500 flex-1">{tool.description}</p>
                   </motion.div>

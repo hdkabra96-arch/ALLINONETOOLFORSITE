@@ -9,6 +9,7 @@ interface DropzoneProps {
   maxFiles?: number;
   title?: string;
   subtitle?: string;
+  buttonText?: string;
 }
 
 export function Dropzone({ 
@@ -16,7 +17,8 @@ export function Dropzone({
   accept = { 'application/pdf': ['.pdf'] }, 
   maxFiles = 0, // 0 means unlimited
   title = "Select PDF files",
-  subtitle = "or drop PDFs here"
+  subtitle = "or drop PDFs here",
+  buttonText = "Select PDF files"
 }: DropzoneProps) {
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
@@ -49,7 +51,7 @@ export function Dropzone({
       <p className="text-slate-500">{subtitle}</p>
       
       <button className="mt-8 bg-red-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-red-700 transition-colors shadow-lg shadow-red-200">
-        Select PDF files
+        {buttonText}
       </button>
     </div>
   );

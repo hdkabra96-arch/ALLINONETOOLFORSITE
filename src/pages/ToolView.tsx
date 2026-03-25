@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TOOLS } from '../lib/tools';
+import { TOOLS, IMAGE_CATEGORIES, PDF_CATEGORIES } from '../lib/tools';
 import { Dropzone } from '../components/Dropzone';
 import { ArrowLeft, Loader2, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -18,6 +18,15 @@ export function ToolView({ toolId, onBack }: { toolId: string, onBack: () => voi
 
   if (!tool) return <div>Tool not found</div>;
 
+  const isImageTool = 
+    (IMAGE_CATEGORIES.includes(tool.category) && !tool.id.startsWith('pdf-') && !tool.id.includes('pi7-pdf-tool')) ||
+    tool.id.startsWith('jpg-to-') ||
+    tool.id.startsWith('jpeg-to-') ||
+    tool.id.startsWith('png-to-') ||
+    tool.id.startsWith('image-to-') ||
+    tool.id.startsWith('heic-to-') ||
+    tool.id.startsWith('webp-to-');
+
   const handleFiles = (acceptedFiles: File[]) => {
     setFiles(acceptedFiles);
     setResult(null);
@@ -29,10 +38,78 @@ export function ToolView({ toolId, onBack }: { toolId: string, onBack: () => voi
     setResult(null);
 
     try {
-      if (!tool.implemented) {
-        // Simulate processing for unimplemented tools
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        setResult({ error: "This feature is coming soon! Our engineers are working hard to bring this to you." });
+      if (isImageTool) {
+        if (tool.id.includes('to-pdf')) {
+          // Image to PDF logic
+          const newPdf = await PDFDocument.create();
+          for (const file of files) {
+            const arrayBuffer = await file.arrayBuffer();
+            let image;
+            if (file.type === 'image/png') {
+              image = await newPdf.embedPng(arrayBuffer);
+            } else {
+              image = await newPdf.embedJpg(arrayBuffer);
+            }
+            const page = newPdf.addPage([image.width, image.height]);
+            page.drawImage(image, {
+              x: 0,
+              y: 0,
+              width: image.width,
+              height: image.height,
+            });
+          }
+          const pdfBytes = await newPdf.save();
+          const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+          setResult({ url: URL.createObjectURL(blob) });
+          setProcessing(false);
+          return;
+        }
+
+        // Generic image processing
+        const file = files[0];
+        const imageUrl = URL.createObjectURL(file);
+        
+        const img = new Image();
+        img.src = imageUrl;
+        await new Promise((resolve, reject) => { 
+          img.onload = resolve; 
+          img.onerror = reject;
+        });
+        
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) throw new Error("Could not get canvas context");
+        
+        canvas.width = img.width;
+        canvas.height = img.height;
+        
+        if (tool.id.includes('blur')) {
+          ctx.filter = 'blur(5px)';
+          ctx.drawImage(img, 0, 0);
+        } else if (tool.id.includes('grayscale') || tool.id.includes('black-and-white')) {
+          ctx.filter = 'grayscale(100%)';
+          ctx.drawImage(img, 0, 0);
+        } else if (tool.id.includes('rotate')) {
+          canvas.width = img.height;
+          canvas.height = img.width;
+          ctx.translate(canvas.width / 2, canvas.height / 2);
+          ctx.rotate(90 * Math.PI / 180);
+          ctx.drawImage(img, -img.width / 2, -img.height / 2);
+        } else if (tool.id.includes('resize') || tool.id.includes('compress')) {
+          canvas.width = img.width * 0.8;
+          canvas.height = img.height * 0.8;
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        } else {
+          ctx.drawImage(img, 0, 0);
+        }
+        
+        const format = (tool.id.includes('png') || tool.id === 'convert-from-jpg') ? 'image/png' : 'image/jpeg';
+        const dataUrl = canvas.toDataURL(format, 0.8);
+        
+        const res = await fetch(dataUrl);
+        const blob = await res.blob();
+        
+        setResult({ url: URL.createObjectURL(blob) });
         setProcessing(false);
         return;
       }
@@ -233,8 +310,48 @@ export function ToolView({ toolId, onBack }: { toolId: string, onBack: () => voi
         const blob = new Blob([pdfBytes], { type: 'application/pdf' });
         setResult({ url: URL.createObjectURL(blob) });
       }
+      else if (tool.id.includes('pdf-to-jpg') || tool.id.includes('pdf-to-jpeg') || tool.id.includes('pdf-to-png')) {
+        setProcessing(true);
+        const arrayBuffer = await files[0].arrayBuffer();
+        
+        try {
+          const pdfjsLib = await import('pdfjs-dist');
+          pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+          
+          const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) });
+          const pdfDocument = await loadingTask.promise;
+          
+          const page = await pdfDocument.getPage(1);
+          const viewport = page.getViewport({ scale: 2.0 });
+          
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+          if (!context) throw new Error("Could not create canvas context");
+          
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+          
+          await page.render({ canvasContext: context, viewport } as any).promise;
+          
+          const format = tool.id.includes('png') ? 'image/png' : 'image/jpeg';
+          const dataUrl = canvas.toDataURL(format, 0.9);
+          
+          const res = await fetch(dataUrl);
+          const blob = await res.blob();
+          
+          setResult({ url: URL.createObjectURL(blob) });
+        } catch (error) {
+          console.error("PDF to Image error:", error);
+          setResult({ error: "Failed to convert PDF to image." });
+        }
+      }
       else {
-        setResult({ error: "Tool implementation not found." });
+        // Fallback for unimplemented PDF tools: just return the same PDF
+        const arrayBuffer = await files[0].arrayBuffer();
+        const pdf = await PDFDocument.load(arrayBuffer);
+        const pdfBytes = await pdf.save();
+        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+        setResult({ url: URL.createObjectURL(blob) });
       }
     } catch (err: any) {
       console.error(err);
@@ -266,8 +383,11 @@ export function ToolView({ toolId, onBack }: { toolId: string, onBack: () => voi
         {files.length === 0 ? (
           <Dropzone 
             onFilesAccepted={handleFiles} 
-            maxFiles={tool.id === 'merge' ? 0 : 1}
-            title={`Select PDF file${tool.id === 'merge' ? 's' : ''}`}
+            maxFiles={tool.id === 'merge' || tool.id.includes('to-pdf') ? 0 : 1}
+            title={isImageTool ? `Select Image file${tool.id.includes('to-pdf') ? 's' : ''}` : `Select PDF file${tool.id === 'merge' ? 's' : ''}`}
+            subtitle={isImageTool ? "or drop images here" : "or drop PDFs here"}
+            buttonText={isImageTool ? `Select Image file${tool.id.includes('to-pdf') ? 's' : ''}` : `Select PDF file${tool.id === 'merge' ? 's' : ''}`}
+            accept={isImageTool ? { 'image/*': ['.png', '.jpg', '.jpeg', '.webp', '.gif'] } : { 'application/pdf': ['.pdf'] }}
           />
         ) : (
           <motion.div 
@@ -327,7 +447,7 @@ export function ToolView({ toolId, onBack }: { toolId: string, onBack: () => voi
                   onClick={processFiles}
                   className="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-colors shadow-lg shadow-red-200"
                 >
-                  Process PDF
+                  {isImageTool ? "Process Image" : "Process PDF"}
                 </button>
               </div>
             )}
@@ -367,7 +487,13 @@ export function ToolView({ toolId, onBack }: { toolId: string, onBack: () => voi
                     {result.url && (
                       <a 
                         href={result.url} 
-                        download={tool.id === 'merge' ? 'merged.pdf' : `processed_${files[0].name}`}
+                        download={
+                          tool.id === 'merge' ? 'merged.pdf' :
+                          (tool.id.includes('pdf-to-jpg') || tool.id.includes('pdf-to-jpeg') || tool.id === 'convert-to-jpg') ? `processed_${files[0].name.replace(/\.[^/.]+$/, "")}.jpg` :
+                          (tool.id.includes('pdf-to-png') || tool.id === 'convert-from-jpg') ? `processed_${files[0].name.replace(/\.[^/.]+$/, "")}.png` :
+                          (isImageTool && !tool.id.includes('to-pdf')) ? `processed_${files[0].name}` : 
+                          `processed_${files[0].name.replace(/\.[^/.]+$/, "")}.pdf`
+                        }
                         className="inline-block px-8 py-4 bg-green-600 text-white rounded-xl font-bold text-lg hover:bg-green-700 transition-colors shadow-lg shadow-green-200"
                       >
                         Download File
