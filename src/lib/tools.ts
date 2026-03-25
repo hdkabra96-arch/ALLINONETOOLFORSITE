@@ -61,6 +61,26 @@ import {
   FileAudio,
   List,
   Film,
+  AlignLeft,
+  BookOpen,
+  CheckCircle,
+  Minimize2,
+  Mic,
+  Youtube,
+  Instagram,
+  HelpCircle,
+  Linkedin,
+  Lightbulb,
+  Mail,
+  Home as HomeIcon,
+  Shield,
+  Calendar,
+  Twitter,
+  Video,
+  MessageSquare,
+  Facebook,
+  BarChart2,
+  Layout,
   type LucideIcon
 } from 'lucide-react';
 
@@ -87,10 +107,12 @@ export type ToolCategory =
   | 'GIF Tools'
   | 'Pi7 Tools'
   | 'Other Tools'
-  | 'Convert Images';
+  | 'Convert Images'
+  | 'AI Write'
+  | 'Pdf Tools';
 
 export const PDF_CATEGORIES: ToolCategory[] = [
-  'Organize', 'Optimize', 'Convert to PDF', 'Convert from PDF', 'Edit', 'Security', 'AI Tools'
+  'Organize', 'Optimize', 'Convert to PDF', 'Convert from PDF', 'Edit', 'Security', 'AI Tools', 'Pdf Tools'
 ];
 
 export const IMAGE_CATEGORIES: ToolCategory[] = [
@@ -98,6 +120,10 @@ export const IMAGE_CATEGORIES: ToolCategory[] = [
   'General Resizing', 'Resize Other Official Sizes', 'Passport & ID Photo Sizes',
   'Resize For Social Media', 'Format Conversions', 'Image to PDF', 'General Compression',
   'Exact Target Sizes', 'GIF Tools', 'Pi7 Tools', 'Other Tools', 'Convert Images'
+];
+
+export const AI_WRITE_CATEGORIES: ToolCategory[] = [
+  'AI Write'
 ];
 
 export interface Tool {
@@ -312,4 +338,60 @@ export const TOOLS: Tool[] = [
   { id: 'jpg-to-pdf-under-500kb', name: 'JPG to PDF Under 500KB', icon: FileType2, category: 'Convert Images', description: 'Convert JPG to PDF under 500KB.' },
   { id: 'jpg-to-text-2', name: 'JPG to Text', icon: FileText, category: 'Convert Images', description: 'Extract text from JPG.' },
   { id: 'jpeg-to-png-2', name: 'JPEG to PNG', icon: FileImage, category: 'Convert Images', description: 'Convert JPEG to PNG.' },
+
+  // AI Write Tools
+  { id: 'content-improver', name: 'Content Improver', icon: Wand2, category: 'AI Write', description: 'Improve your content' },
+  { id: 'essay-writer', name: 'Essay Writer', icon: FileText, category: 'AI Write', description: 'Easily create an essay with AI' },
+  { id: 'paragraph-writer', name: 'Paragraph Writer', icon: AlignLeft, category: 'AI Write', description: 'Paragraph Writer' },
+  { id: 'paragraph-completer', name: 'Paragraph Completer', icon: AlignLeft, category: 'AI Write', description: 'Paragraph Completer' },
+  { id: 'story-generator', name: 'Story Generator', icon: BookOpen, category: 'AI Write', description: 'Generate a Story' },
+  { id: 'grammar-fixer', name: 'Grammar Fixer', icon: CheckCircle, category: 'AI Write', description: 'Easily fix the grammar in a block of text' },
+  { id: 'sentence-rewriter', name: 'Sentence Rewriter', icon: RefreshCw, category: 'AI Write', description: 'Sentence Rewriter' },
+  { id: 'article-writer', name: 'Article Writer', icon: FileText, category: 'AI Write', description: 'Create an article from a title' },
+  { id: 'content-summarizer', name: 'Content Summarizer', icon: Minimize2, category: 'AI Write', description: 'Summarize text' },
+  { id: 'ai-humanizer', name: 'AI Humanizer', icon: User, category: 'AI Write', description: 'Use the AI Humanizer to makes AI text sound more human' },
+  { id: 'tone-of-voice', name: 'Tone of Voice', icon: Mic, category: 'AI Write', description: 'Tone of Voice Tool' },
+  { id: 'youtube-script-writer', name: 'YouTube Script Writer', icon: Youtube, category: 'AI Write', description: 'Generate a YouTube script' },
+  { id: 'paragraph-rewriter', name: 'Paragraph Rewriter', icon: RefreshCw, category: 'AI Write', description: 'Rephrase a paragraph' },
+  { id: 'instagram-caption-generator', name: 'Instagram Caption Generator', icon: Instagram, category: 'AI Write', description: 'Generate instagram caption for your post' },
+  { id: 'explain-it', name: 'Explain it', icon: HelpCircle, category: 'AI Write', description: 'Explain it like i’m five' },
+  { id: 'article-generator', name: 'Article Generator', icon: FileText, category: 'AI Write', description: 'AI SEO Optimized Article Generator' },
+  { id: 'content-shortener', name: 'Content Shortener', icon: Minimize, category: 'AI Write', description: 'Resize your content' },
+  { id: 'translate', name: 'Translate', icon: Languages, category: 'AI Write', description: 'Easily Translate Text' },
+  { id: 'title-rewriter', name: 'Title Rewriter', icon: Type, category: 'AI Write', description: 'Rewrite your article title' },
+  { id: 'linkedin-post-generator', name: 'LinkedIn Post Generator', icon: Linkedin, category: 'AI Write', description: 'Generate linkedin post for your profile' },
+  { id: 'blog-post-generator', name: 'Blog Post Generator', icon: FileText, category: 'AI Write', description: 'AI SEO Post Generator' },
+  { id: 'business-name-generator', name: 'Business Name Generator', icon: Briefcase, category: 'AI Write', description: 'Generate a business name for your idea' },
+  { id: 'content-paraphraser', name: 'Content Paraphraser', icon: RefreshCw, category: 'AI Write', description: 'Paraphrasing Content' },
+  { id: 'ai-rephraser', name: 'AI Rephraser', icon: RefreshCw, category: 'AI Write', description: 'AI Rephraser Content' },
+  { id: 'blog-post-ideas', name: 'Blog Post Ideas', icon: Lightbulb, category: 'AI Write', description: 'Write Blog Post Ideas' },
+  { id: 'business-plan-generator', name: 'Business Plan Generator', icon: FileText, category: 'AI Write', description: 'Generate business plan for you' },
+  { id: 'cold-email-write', name: 'Cold Email Write', icon: Mail, category: 'AI Write', description: 'Write cold email for you' },
+  { id: 'article-rewriter', name: 'Article Rewriter', icon: RefreshCw, category: 'AI Write', description: 'Rewrite an article' },
+  { id: 'meta-description-generator', name: 'Meta Description Generator', icon: Search, category: 'AI Write', description: 'Generate a meta description for your article' },
+  { id: 'real-estate-descriptions', name: 'Real Estate Descriptions', icon: HomeIcon, category: 'AI Write', description: 'Generate Real Estate Descriptions for your' },
+  { id: 'ai-detector', name: 'AI Detector', icon: Shield, category: 'AI Write', description: 'AI Content Detector' },
+  { id: 'blog-outline-generator', name: 'Blog Outline Generator', icon: List, category: 'AI Write', description: 'Write Blog Outline' },
+  { id: 'summarize-pdf', name: 'Summarize Pdf', icon: FileText, category: 'Pdf Tools', description: 'Summarize Pdf Document' },
+  { id: 'post-writer', name: 'Post Writer', icon: Edit3, category: 'AI Write', description: 'Generate a blog post' },
+  { id: 'content-planner', name: 'Content Planner', icon: Calendar, category: 'AI Write', description: 'Generate a simple content plan' },
+  { id: 'twitter-generator', name: 'Twitter Generator', icon: Twitter, category: 'AI Write', description: 'Twitter generator' },
+  { id: 'tiktok-script-writer', name: 'TikTok Script Writer', icon: Video, category: 'AI Write', description: 'TikTok Script Writer' },
+  { id: 'content-brief-generator', name: 'Content Brief Generator', icon: FileText, category: 'AI Write', description: 'Generator content brief for your article title' },
+  { id: 'business-slogan-generator', name: 'Business Slogan Generator', icon: MessageSquare, category: 'AI Write', description: 'Generate business slogan for you' },
+  { id: 'instagram-story-idea', name: 'Instagram Story Idea', icon: Instagram, category: 'AI Write', description: 'Generate instagram story ideas for you' },
+  { id: 'fb-headline-generator', name: 'FB Headline Generator', icon: Facebook, category: 'AI Write', description: 'Generate facebook ad headlines for your company' },
+  { id: 'trivia-generator', name: 'Trivia Generator', icon: HelpCircle, category: 'AI Write', description: 'Generate Trivia Questions' },
+  { id: 'press-release-generator', name: 'Press Release Generator', icon: FileText, category: 'AI Write', description: 'Generate a press release' },
+  { id: 'podcast-script-writer', name: 'Podcast Script Writer', icon: Mic, category: 'AI Write', description: 'Podcast Script Generator' },
+  { id: 'faq-generator', name: 'FAQ Generator', icon: HelpCircle, category: 'AI Write', description: 'Generate FAQ for a blog' },
+  { id: 'blog-post-rewriter', name: 'Blog Post Rewriter', icon: RefreshCw, category: 'AI Write', description: 'Rephrase a blog post' },
+  { id: 'poll-generator', name: 'Poll Generator', icon: BarChart2, category: 'AI Write', description: 'AI Generated Polls' },
+  { id: 'landing-page-copy-generator', name: 'Landing Page Copy Generator', icon: Layout, category: 'AI Write', description: 'Generate landing page copy' },
+  { id: 'bill-of-sale', name: 'Bill of Sale', icon: FileText, category: 'AI Write', description: 'Generate bill of sale for your' },
+  { id: 'purchase-agreement', name: 'Purchase Agreement', icon: FileText, category: 'AI Write', description: 'Generate purchase agreement for your' },
+  { id: 'nda-generator', name: 'NDA Generator', icon: FileText, category: 'AI Write', description: 'Generate NDA for your' },
+  { id: 'privacy-policy-generator', name: 'Privacy Policy Generator', icon: FileText, category: 'AI Write', description: 'Generate privacy policy for your' },
+  { id: 'word-counter', name: 'Word Counter', icon: Type, category: 'AI Write', description: 'Count words in your text' },
+  { id: 'summarize-youtube', name: 'Summarize YouTube', icon: Youtube, category: 'AI Write', description: 'Summarize YouTube Video' },
 ];

@@ -5,6 +5,7 @@ import { ArrowLeft, Loader2, CheckCircle2, AlertCircle, Sparkles } from 'lucide-
 import { motion } from 'motion/react';
 import { PDFDocument, degrees } from 'pdf-lib';
 import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+import { GoogleGenAI } from "@google/genai";
 
 export function ToolView({ toolId, onBack }: { toolId: string, onBack: () => void }) {
   const tool = TOOLS.find(t => t.id === toolId);
@@ -15,8 +16,11 @@ export function ToolView({ toolId, onBack }: { toolId: string, onBack: () => voi
   // Tool specific states
   const [password, setPassword] = useState('');
   const [watermarkText, setWatermarkText] = useState('CONFIDENTIAL');
+  const [textInput, setTextInput] = useState('');
 
   if (!tool) return <div>Tool not found</div>;
+
+  const isTextTool = tool.category === 'AI Write';
 
   const isImageTool = 
     (IMAGE_CATEGORIES.includes(tool.category) && !tool.id.startsWith('pdf-') && !tool.id.includes('pi7-pdf-tool')) ||
@@ -33,11 +37,24 @@ export function ToolView({ toolId, onBack }: { toolId: string, onBack: () => voi
   };
 
   const processFiles = async () => {
-    if (files.length === 0) return;
+    if (!isTextTool && files.length === 0) return;
+    if (isTextTool && !textInput.trim()) return;
+    
     setProcessing(true);
     setResult(null);
 
     try {
+      if (isTextTool) {
+        const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+        const response = await ai.models.generateContent({
+          model: "gemini-3-flash-preview",
+          contents: `You are an expert AI assistant. Please perform the following task: ${tool.name}\n\nUser Input:\n${textInput}`,
+        });
+        setResult({ text: response.text });
+        setProcessing(false);
+        return;
+      }
+
       if (isImageTool) {
         if (tool.id.includes('to-pdf')) {
           // Image to PDF logic
@@ -345,6 +362,39 @@ export function ToolView({ toolId, onBack }: { toolId: string, onBack: () => voi
           setResult({ error: "Failed to convert PDF to image." });
         }
       }
+      else if (tool.id === 'summarize-pdf') {
+        const file = files[0];
+        const base64EncodeString = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const result = reader.result as string;
+            // Remove the data URL prefix (e.g., "data:application/pdf;base64,")
+            const base64 = result.split(',')[1];
+            resolve(base64);
+          };
+          reader.onerror = error => reject(error);
+          reader.readAsDataURL(file);
+        });
+
+        const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+        const response = await ai.models.generateContent({
+          model: "gemini-3-flash-preview",
+          contents: {
+            parts: [
+              {
+                inlineData: {
+                  mimeType: "application/pdf",
+                  data: base64EncodeString,
+                },
+              },
+              {
+                text: "Please summarize this PDF document.",
+              },
+            ],
+          },
+        });
+        setResult({ text: response.text });
+      }
       else {
         // Fallback for unimplemented PDF tools: just return the same PDF
         const arrayBuffer = await files[0].arrayBuffer();
@@ -380,7 +430,84 @@ export function ToolView({ toolId, onBack }: { toolId: string, onBack: () => voi
           <p className="text-xl text-slate-600 max-w-2xl mx-auto">{tool.description}</p>
         </div>
 
-        {files.length === 0 ? (
+        {isTextTool ? (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 max-w-3xl mx-auto"
+          >
+            {!result ? (
+              <>
+                <div className="mb-8">
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Input Text</label>
+                  <textarea 
+                    value={textInput}
+                    onChange={(e) => setTextInput(e.target.value)}
+                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none min-h-[200px] resize-y"
+                    placeholder="Enter your text here..."
+                  />
+                </div>
+                <div className="flex space-x-4">
+                  <button 
+                    onClick={onBack}
+                    className="flex-1 px-6 py-3 border border-slate-300 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={processFiles}
+                    disabled={!textInput.trim() || processing}
+                    className="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-colors shadow-lg shadow-red-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                  >
+                    {processing ? (
+                      <>
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-5 h-5 mr-2" />
+                        Generate
+                      </>
+                    )}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="text-center">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-600 mb-6">
+                  <CheckCircle2 className="w-8 h-8" />
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-2">Success!</h3>
+                <p className="text-slate-600 mb-8">Your text has been processed successfully.</p>
+                
+                <div className="bg-slate-50 rounded-xl p-6 text-left mb-8 border border-slate-200 whitespace-pre-wrap text-slate-700">
+                  {result.text}
+                </div>
+
+                <div className="flex justify-center space-x-4">
+                  <button 
+                    onClick={() => {
+                      setResult(null);
+                      setTextInput('');
+                    }}
+                    className="px-8 py-4 border border-slate-300 text-slate-700 rounded-xl font-bold text-lg hover:bg-slate-50 transition-colors"
+                  >
+                    Process Another
+                  </button>
+                  <button 
+                    onClick={() => {
+                      navigator.clipboard.writeText(result.text || '');
+                    }}
+                    className="px-8 py-4 bg-green-600 text-white rounded-xl font-bold text-lg hover:bg-green-700 transition-colors shadow-lg shadow-green-200"
+                  >
+                    Copy to Clipboard
+                  </button>
+                </div>
+              </div>
+            )}
+          </motion.div>
+        ) : files.length === 0 ? (
           <Dropzone 
             onFilesAccepted={handleFiles} 
             maxFiles={tool.id === 'merge' || tool.id.includes('to-pdf') ? 0 : 1}

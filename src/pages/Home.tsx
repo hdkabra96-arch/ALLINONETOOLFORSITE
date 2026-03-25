@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { TOOLS, PDF_CATEGORIES, IMAGE_CATEGORIES, type ToolCategory } from '../lib/tools';
+import { TOOLS, PDF_CATEGORIES, IMAGE_CATEGORIES, AI_WRITE_CATEGORIES, type ToolCategory } from '../lib/tools';
 import { cn } from '../lib/utils';
 import { Search } from 'lucide-react';
 import type { ToolFilter } from '../App';
@@ -10,11 +10,13 @@ export function Home({ onSelectTool, currentFilter }: { onSelectTool: (id: strin
 
   let categoriesToDisplay: ToolCategory[] = [];
   if (currentFilter === 'ALL') {
-    categoriesToDisplay = [...PDF_CATEGORIES, ...IMAGE_CATEGORIES];
+    categoriesToDisplay = [...PDF_CATEGORIES, ...IMAGE_CATEGORIES, ...AI_WRITE_CATEGORIES];
   } else if (currentFilter === 'PDF') {
     categoriesToDisplay = PDF_CATEGORIES;
   } else if (currentFilter === 'IMAGE') {
     categoriesToDisplay = IMAGE_CATEGORIES;
+  } else if (currentFilter === 'AI_WRITE') {
+    categoriesToDisplay = AI_WRITE_CATEGORIES;
   }
 
   const filteredTools = TOOLS.filter(tool => 

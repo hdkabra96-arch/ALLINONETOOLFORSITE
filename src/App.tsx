@@ -8,7 +8,7 @@ import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
 import { ToolView } from './pages/ToolView';
 
-export type ToolFilter = 'ALL' | 'IMAGE' | 'PDF';
+export type ToolFilter = 'ALL' | 'IMAGE' | 'PDF' | 'AI_WRITE';
 
 export default function App() {
   const [currentTool, setCurrentTool] = useState<string | null>(null);

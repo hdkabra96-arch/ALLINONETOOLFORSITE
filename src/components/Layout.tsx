@@ -36,6 +36,12 @@ export function Layout({ children, onNavigateHome, currentFilter, onFilterChange
                 PDF
               </button>
               <button 
+                onClick={() => onFilterChange('AI_WRITE')} 
+                className={cn("text-sm font-bold transition-colors", currentFilter === 'AI_WRITE' ? "text-red-600" : "text-slate-600 hover:text-slate-900")}
+              >
+                AI WRITE
+              </button>
+              <button 
                 onClick={() => onFilterChange('ALL')} 
                 className={cn("text-sm font-bold transition-colors", currentFilter === 'ALL' ? "text-red-600" : "text-slate-600 hover:text-slate-900")}
               >
